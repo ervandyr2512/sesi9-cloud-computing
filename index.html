@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📚 LibraryHub — Manajemen Koleksi Buku</title>
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <!-- External Stylesheet -->
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     HEADER
+══════════════════════════════════════════ -->
+<header>
+  <div class="header-inner">
+    <a class="logo" href="#">
+      <div class="logo-icon"><i class="fas fa-book-open"></i></div>
+      <div>
+        <div class="logo-text">LibraryHub</div>
+        <div class="logo-sub">Sistem Manajemen Buku</div>
+      </div>
+    </a>
+    <div class="header-stats">
+      <div class="stat-chip">
+        <span class="count" id="stat-total">0</span> Total Buku
+      </div>
+      <div class="stat-chip">
+        <i class="fas fa-circle" style="color:var(--sage);font-size:0.5rem"></i>
+        <span class="count" id="stat-available">0</span> Tersedia
+      </div>
+      <div class="stat-chip">
+        <i class="fas fa-circle" style="color:var(--amber);font-size:0.5rem"></i>
+        <span class="count" id="stat-borrowed">0</span> Dipinjam
+      </div>
+      <div class="user-chip" id="user-chip" style="display:none;">
+        <div class="user-avatar" id="user-avatar">?</div>
+        <span id="user-name">...</span>
+        <button class="logout-btn" id="btn-logout" title="Keluar">
+          <i class="fas fa-right-from-bracket"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════
+     HERO SECTION
+══════════════════════════════════════════ -->
+<div class="hero">
+  <div class="hero-tag">
+    <i class="fas fa-fire-flame-curved"></i> Firebase Realtime Database
+  </div>
+  <h1>Kelola Koleksi Buku<br/><em>dengan Mudah &amp; Cepat</em></h1>
+  <p>Sistem perpustakaan digital berbasis Firebase — tambah, lihat, edit, dan hapus data buku secara real-time.</p>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MAIN CONTAINER
+══════════════════════════════════════════ -->
+<div class="container">
+
+  <!-- Firebase Config Notice (sudah terkonfigurasi) -->
+  <!-- <div class="config-notice" id="config-notice">...</div> -->
+
+  <!-- Navigation Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" id="btn-tab-list">
+      <span class="tab-icon"><i class="fas fa-list"></i></span> Daftar Buku
+    </button>
+    <button class="tab-btn" id="btn-tab-add">
+      <span class="tab-icon"><i class="fas fa-plus"></i></span> Tambah Buku
+    </button>
+  </div>
+
+  <!-- ────────────────────────────────────────
+       TAB 1: DAFTAR BUKU (READ)
+  ──────────────────────────────────────────── -->
+  <div id="tab-list" class="tab-content active">
+    <div class="card">
+      <div class="card-title">
+        <div class="icon-badge badge-add"><i class="fas fa-books"></i></div>
+        Koleksi Buku Perpustakaan
+      </div>
+      <div class="card-subtitle">Semua data buku tersimpan secara real-time di Firebase.</div>
+
+      <!-- Search & Filter -->
+      <div class="search-bar">
+        <div class="search-wrap">
+          <i class="fas fa-magnifying-glass"></i>
+          <input
+            type="text"
+            id="search-input"
+            placeholder="Cari judul, pengarang, atau ISBN…"
+            oninput="filterBooks()"
+          />
+        </div>
+        <select class="filter-select" id="filter-genre" onchange="filterBooks()">
+          <option value="">Semua Genre</option>
+          <option>Fiksi</option>
+          <option>Non-Fiksi</option>
+          <option>Sains &amp; Teknologi</option>
+          <option>Sejarah</option>
+          <option>Biografi</option>
+          <option>Pendidikan</option>
+          <option>Lainnya</option>
+        </select>
+        <select class="filter-select" id="filter-status" onchange="filterBooks()">
+          <option value="">Semua Status</option>
+          <option>Tersedia</option>
+          <option>Dipinjam</option>
+          <option>Hilang</option>
+        </select>
+      </div>
+
+      <!-- Tabel buku di-render oleh app.js -->
+      <div id="books-container">
+        <div class="loader">
+          <div class="spinner"></div>
+          Memuat data dari Firebase…
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ────────────────────────────────────────
+       TAB 2: TAMBAH BUKU (CREATE)
+  ──────────────────────────────────────────── -->
+  <div id="tab-add" class="tab-content">
+    <div class="card">
+      <div class="card-title">
+        <div class="icon-badge badge-add"><i class="fas fa-plus"></i></div>
+        Tambah Buku Baru
+      </div>
+      <div class="card-subtitle">Isi form di bawah ini untuk menambahkan buku ke koleksi perpustakaan.</div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Judul Buku <span>*</span></label>
+          <input type="text" id="add-title" placeholder="cth. Laskar Pelangi"/>
+        </div>
+        <div class="form-group">
+          <label>Pengarang <span>*</span></label>
+          <input type="text" id="add-author" placeholder="cth. Andrea Hirata"/>
+        </div>
+        <div class="form-group">
+          <label>ISBN <span>*</span></label>
+          <input type="text" id="add-isbn" placeholder="cth. 978-6020314020"/>
+        </div>
+        <div class="form-group">
+          <label>Tahun Terbit <span>*</span></label>
+          <input type="number" id="add-year" placeholder="cth. 2023" min="1800" max="2099"/>
+        </div>
+        <div class="form-group">
+          <label>Genre <span>*</span></label>
+          <select id="add-genre">
+            <option value="">— Pilih Genre —</option>
+            <option>Fiksi</option>
+            <option>Non-Fiksi</option>
+            <option>Sains &amp; Teknologi</option>
+            <option>Sejarah</option>
+            <option>Biografi</option>
+            <option>Pendidikan</option>
+            <option>Lainnya</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="add-status">
+            <option value="Tersedia">Tersedia</option>
+            <option value="Dipinjam">Dipinjam</option>
+            <option value="Hilang">Hilang</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Deskripsi / Sinopsis</label>
+          <textarea id="add-desc" placeholder="Tulis sinopsis singkat buku ini…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" id="btn-add-book">
+          <i class="fas fa-plus-circle"></i> Simpan ke Firebase
+        </button>
+        <button class="btn btn-ghost" id="btn-clear-form">
+          <i class="fas fa-rotate-left"></i> Reset Form
+        </button>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /container -->
+
+<!-- ══════════════════════════════════════════
+     MODAL: DETAIL BUKU (READ)
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="card-title" style="font-size:1.2rem;">
+          <div class="icon-badge" style="background:rgba(61,43,31,0.10);color:var(--brown-deep)">
+            <i class="fas fa-eye"></i>
+          </div>
+          Detail Buku
+        </div>
+      </div>
+      <button class="modal-close" id="btn-close-detail-1">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+    <!-- Konten detail di-render oleh app.js -->
+    <div class="detail-grid" id="detail-content"></div>
+    <div class="form-actions" style="margin-top:24px;">
+      <button class="btn btn-ghost" id="btn-close-detail-2">
+        <i class="fas fa-xmark"></i> Tutup
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL: EDIT BUKU (UPDATE)
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="card-title" style="font-size:1.2rem;">
+          <div class="icon-badge badge-edit"><i class="fas fa-pen"></i></div>
+          Edit Data Buku
+        </div>
+        <div class="card-subtitle" style="margin-bottom:0;">Ubah informasi buku lalu simpan perubahan.</div>
+      </div>
+      <button class="modal-close" id="btn-close-edit">
+        <i class="fas fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Hidden ID untuk referensi Firebase key -->
+    <input type="hidden" id="edit-id"/>
+
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Judul Buku <span>*</span></label>
+        <input type="text" id="edit-title"/>
+      </div>
+      <div class="form-group">
+        <label>Pengarang <span>*</span></label>
+        <input type="text" id="edit-author"/>
+      </div>
+      <div class="form-group">
+        <label>ISBN</label>
+        <input type="text" id="edit-isbn"/>
+      </div>
+      <div class="form-group">
+        <label>Tahun Terbit</label>
+        <input type="number" id="edit-year" min="1800" max="2099"/>
+      </div>
+      <div class="form-group">
+        <label>Genre</label>
+        <select id="edit-genre">
+          <option>Fiksi</option>
+          <option>Non-Fiksi</option>
+          <option>Sains &amp; Teknologi</option>
+          <option>Sejarah</option>
+          <option>Biografi</option>
+          <option>Pendidikan</option>
+          <option>Lainnya</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="edit-status">
+          <option value="Tersedia">Tersedia</option>
+          <option value="Dipinjam">Dipinjam</option>
+          <option value="Hilang">Hilang</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Deskripsi / Sinopsis</label>
+        <textarea id="edit-desc"></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-amber" id="btn-save-edit">
+        <i class="fas fa-floppy-disk"></i> Simpan Perubahan
+      </button>
+      <button class="btn btn-ghost" id="btn-cancel-edit">
+        <i class="fas fa-xmark"></i> Batal
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+     MODAL: KONFIRMASI HAPUS (DELETE)
+══════════════════════════════════════════ -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:440px;text-align:center;">
+    <div style="font-size:3rem;margin-bottom:16px;">🗑️</div>
+    <div class="card-title" style="justify-content:center;margin-bottom:8px;">Hapus Buku?</div>
+    <p style="color:var(--brown-mid);margin-bottom:28px;font-size:0.93rem;">
+      Tindakan ini tidak dapat dibatalkan. Buku akan dihapus permanen dari Firebase.
+    </p>
+    <!-- Hidden ID buku yang akan dihapus -->
+    <input type="hidden" id="delete-id"/>
+    <div class="form-actions" style="justify-content:center;">
+      <button class="btn btn-danger" id="btn-confirm-delete">
+        <i class="fas fa-trash"></i> Ya, Hapus
+      </button>
+      <button class="btn btn-ghost" id="btn-cancel-delete">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification Container -->
+<div id="toast-container"></div>
+
+<!-- Firebase Compat SDK -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+
+<!-- External JavaScript App Logic -->
+<script src="auth.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>

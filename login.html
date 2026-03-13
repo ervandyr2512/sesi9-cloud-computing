@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📚 LibraryHub — Login</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+
+  <style>
+    :root {
+      --cream: #FAF6F0;
+      --warm-white: #FFFDF9;
+      --ink: #1A1209;
+      --brown-deep: #3D2B1F;
+      --brown-mid: #7B4F2E;
+      --amber: #C8872A;
+      --amber-light: #E8A84A;
+      --sage: #6B8C6E;
+      --rust: #C0472B;
+      --rust-light: #E05C3B;
+      --shadow-hover: 0 16px 60px rgba(61,43,31,0.22);
+      --radius: 20px;
+      --radius-sm: 10px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background-color: var(--cream);
+      color: var(--ink);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      overflow: hidden;
+    }
+    body::before {
+      content: '';
+      position: fixed; inset: 0;
+      background-image:
+        radial-gradient(ellipse 70% 60% at 10% 15%, rgba(200,135,42,0.13) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 70% at 90% 85%, rgba(107,140,110,0.11) 0%, transparent 55%);
+      pointer-events: none; z-index: 0;
+    }
+    .deco { position: fixed; font-size: 9rem; opacity: 0.04; pointer-events: none; z-index: 0; }
+    .deco-1 { top: -2rem; left: -2rem; transform: rotate(-15deg); }
+    .deco-2 { bottom: -2rem; right: -2rem; transform: rotate(20deg); font-size: 11rem; }
+
+    .auth-wrapper {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 460px;
+    }
+    .auth-logo { text-align: center; margin-bottom: 28px; }
+    .auth-logo-icon {
+      width: 64px; height: 64px;
+      background: linear-gradient(135deg, var(--brown-deep), var(--amber));
+      border-radius: 16px;
+      display: inline-flex; align-items: center; justify-content: center;
+      color: white; font-size: 1.8rem;
+      box-shadow: 0 8px 24px rgba(61,43,31,0.30);
+      margin-bottom: 12px;
+    }
+    .auth-logo h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.9rem; font-weight: 900; color: var(--brown-deep);
+    }
+    .auth-logo p { font-size: 0.8rem; color: var(--brown-mid); letter-spacing: 0.08em; text-transform: uppercase; margin-top: 4px; }
+
+    .auth-card {
+      background: var(--warm-white);
+      border: 1px solid rgba(61,43,31,0.09);
+      border-radius: var(--radius);
+      padding: 40px;
+      box-shadow: var(--shadow-hover);
+    }
+
+    .auth-tabs {
+      display: flex;
+      background: var(--cream);
+      border-radius: 50px; padding: 5px;
+      margin-bottom: 28px;
+      border: 1px solid rgba(61,43,31,0.10);
+    }
+    .auth-tab {
+      flex: 1; text-align: center; padding: 10px;
+      border: none; background: none; cursor: pointer;
+      border-radius: 40px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.88rem; font-weight: 600; color: var(--brown-mid);
+      transition: all 0.25s;
+    }
+    .auth-tab.active { background: var(--brown-deep); color: white; box-shadow: 0 4px 14px rgba(61,43,31,0.28); }
+
+    .auth-form { display: none; }
+    .auth-form.active { display: block; animation: fadeUp 0.3s ease; }
+    @keyframes fadeUp { from { opacity:0; transform: translateY(12px); } to { opacity:1; transform: translateY(0); } }
+
+    .auth-form h2 { font-family:'Playfair Display',serif; font-size:1.35rem; font-weight:700; color:var(--brown-deep); margin-bottom:5px; }
+    .auth-form .subtitle { font-size:0.83rem; color:var(--brown-mid); margin-bottom:22px; line-height:1.5; }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .form-group label { font-size:0.76rem; font-weight:600; color:var(--brown-deep); letter-spacing:0.05em; text-transform:uppercase; }
+    .form-group label span { color: var(--rust); }
+
+    .input-wrap { position: relative; }
+    .input-wrap i.ii { position:absolute; left:14px; top:50%; transform:translateY(-50%); color:var(--brown-mid); font-size:0.9rem; pointer-events:none; }
+    .input-wrap input {
+      width: 100%; font-family:'DM Sans',sans-serif; font-size:0.93rem; color:var(--ink);
+      background: var(--cream); border: 1.5px solid rgba(61,43,31,0.15);
+      border-radius: var(--radius-sm); padding: 12px 44px 12px 40px;
+      outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-wrap input:focus { border-color: var(--amber); box-shadow: 0 0 0 3px rgba(200,135,42,0.14); }
+    .toggle-pw {
+      position:absolute; right:12px; top:50%; transform:translateY(-50%);
+      background:none; border:none; cursor:pointer; color:var(--brown-mid); font-size:0.88rem; padding:4px;
+      transition: color 0.15s;
+    }
+    .toggle-pw:hover { color: var(--amber); }
+
+    .pw-bar-track { height:4px; border-radius:2px; background:rgba(61,43,31,0.10); overflow:hidden; margin-top:6px; margin-bottom:3px; }
+    .pw-bar-fill  { height:100%; border-radius:2px; width:0%; transition: width 0.3s, background 0.3s; }
+    .pw-hint      { font-size:0.7rem; color:var(--brown-mid); }
+
+    .btn-auth {
+      width:100%; padding:13px; border:none; cursor:pointer; border-radius:50px;
+      font-family:'DM Sans',sans-serif; font-size:0.93rem; font-weight:700; color:white;
+      background: linear-gradient(135deg, var(--brown-deep), var(--brown-mid));
+      box-shadow: 0 4px 16px rgba(61,43,31,0.30);
+      transition: all 0.2s; display:flex; align-items:center; justify-content:center; gap:8px;
+      margin-top:6px;
+    }
+    .btn-auth:hover { transform:translateY(-2px); box-shadow:0 8px 24px rgba(61,43,31,0.38); }
+    .btn-auth:disabled { opacity:0.6; cursor:not-allowed; transform:none; }
+
+    .spinner-sm {
+      width:17px; height:17px; border:2.5px solid rgba(255,255,255,0.3); border-top-color:white;
+      border-radius:50%; animation:spin 0.7s linear infinite; display:none;
+    }
+    .btn-auth.loading .spinner-sm { display:block; }
+    .btn-auth.loading .btn-lbl    { display:none; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    .auth-divider { display:flex; align-items:center; gap:10px; margin:18px 0; color:var(--brown-mid); font-size:0.76rem; }
+    .auth-divider::before, .auth-divider::after { content:''; flex:1; height:1px; background:rgba(61,43,31,0.12); }
+
+    .auth-footer { text-align:center; font-size:0.82rem; color:var(--brown-mid); }
+    .auth-footer a { color:var(--amber); font-weight:600; text-decoration:none; cursor:pointer; }
+    .auth-footer a:hover { text-decoration:underline; }
+
+    .auth-alert {
+      padding:11px 14px; border-radius:var(--radius-sm); font-size:0.84rem; font-weight:500;
+      margin-bottom:16px; display:none; align-items:center; gap:9px;
+    }
+    .auth-alert.show { display:flex; }
+    .auth-alert.error   { background:rgba(192,71,43,0.10); border:1px solid rgba(192,71,43,0.25); color:var(--rust); }
+    .auth-alert.success { background:rgba(107,140,110,0.12); border:1px solid rgba(107,140,110,0.30); color:var(--sage); }
+
+    #toast-container { position:fixed; bottom:24px; right:24px; z-index:999; display:flex; flex-direction:column; gap:10px; }
+    .toast { display:flex; align-items:center; gap:10px; padding:13px 18px; border-radius:12px; font-size:0.87rem; font-weight:500; color:white; min-width:240px; box-shadow:0 8px 24px rgba(26,18,9,0.22); animation:tIn 0.3s ease, tOut 0.3s ease 2.5s forwards; }
+    .toast-success { background:linear-gradient(135deg,#2D6A4F,#52B788); }
+    .toast-error   { background:linear-gradient(135deg,#9B2226,#D62828); }
+    @keyframes tIn  { from{opacity:0;transform:translateX(50px);} to{opacity:1;transform:translateX(0);} }
+    @keyframes tOut { from{opacity:1;} to{opacity:0;} }
+
+    @media(max-width:480px){ .auth-card{ padding:26px 20px; } }
+  </style>
+</head>
+<body>
+
+<div class="deco deco-1">📚</div>
+<div class="deco deco-2">📖</div>
+
+<div class="auth-wrapper">
+
+  <div class="auth-logo">
+    <div class="auth-logo-icon"><i class="fas fa-book-open"></i></div>
+    <h1>LibraryHub</h1>
+    <p>Sistem Manajemen Perpustakaan Digital</p>
+  </div>
+
+  <div class="auth-card">
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login-btn" onclick="showTab('login')">
+        <i class="fas fa-right-to-bracket"></i> Masuk
+      </button>
+      <button class="auth-tab" id="tab-register-btn" onclick="showTab('register')">
+        <i class="fas fa-user-plus"></i> Daftar
+      </button>
+    </div>
+
+    <!-- LOGIN -->
+    <div class="auth-form active" id="form-login">
+      <h2>Selamat Datang Kembali</h2>
+      <p class="subtitle">Masuk untuk mengelola koleksi buku perpustakaan Anda.</p>
+
+      <div id="login-alert" class="auth-alert error">
+        <i class="fas fa-circle-exclamation"></i>
+        <span id="login-alert-msg"></span>
+      </div>
+
+      <div class="form-group">
+        <label>Email <span>*</span></label>
+        <div class="input-wrap">
+          <i class="fas fa-envelope ii"></i>
+          <input type="email" id="login-email" placeholder="nama@email.com"/>
+          </div>
+      </div>
+      <div class="form-group">
+        <label>Password <span>*</span></label>
+        <div class="input-wrap">
+          <i class="fas fa-lock ii"></i>
+          <input type="password" id="login-password" placeholder="Masukkan password"/>
+          <button class="toggle-pw" type="button" onclick="togglePw('login-password',this)"><i class="fas fa-eye"></i></button>
+        </div>
+      </div>
+
+      <button class="btn-auth" id="btn-login" onclick="doLogin()">
+        <div class="spinner-sm"></div>
+        <span class="btn-lbl"><i class="fas fa-right-to-bracket"></i> Masuk</span>
+      </button>
+      <div class="auth-divider">atau</div>
+      <div class="auth-footer">Belum punya akun? <a onclick="showTab('register')">Daftar sekarang</a></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="auth-form" id="form-register">
+      <h2>Buat Akun Baru</h2>
+      <p class="subtitle">Daftarkan diri Anda untuk mulai menggunakan LibraryHub.</p>
+
+      <div id="register-alert" class="auth-alert error">
+        <i class="fas fa-circle-exclamation"></i>
+        <span id="register-alert-msg"></span>
+      </div>
+
+      <div class="form-group">
+        <label>Nama Lengkap <span>*</span></label>
+        <div class="input-wrap">
+          <i class="fas fa-user ii"></i>
+          <input type="text" id="register-name" placeholder="Nama lengkap Anda"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email <span>*</span></label>
+        <div class="input-wrap">
+          <i class="fas fa-envelope ii"></i>
+          <input type="email" id="register-email" placeholder="nama@email.com"/>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Password <span>*</span></label>
+        <div class="input-wrap">
+          <i class="fas fa-lock ii"></i>
+          <input type="password" id="register-password" placeholder="Minimal 6 karakter" oninput="checkStrength(this.value)"/>
+          <button class="toggle-pw" type="button" onclick="togglePw('register-password',this)"><i class="fas fa-eye"></i></button>
+        </div>
+        <div class="pw-bar-track"><div class="pw-bar-fill" id="pw-bar"></div></div>
+        <div class="pw-hint" id="pw-label">Masukkan password</div>
+      </div>
+      <div class="form-group">
+        <label>Konfirmasi Password <span>*</span></label>
+        <div class="input-wrap">
+          <i class="fas fa-lock ii"></i>
+          <input type="password" id="register-confirm" placeholder="Ulangi password"/>
+          <button class="toggle-pw" type="button" onclick="togglePw('register-confirm',this)"><i class="fas fa-eye"></i></button>
+        </div>
+      </div>
+
+      <button class="btn-auth" id="btn-register" onclick="doRegister()">
+        <div class="spinner-sm"></div>
+        <span class="btn-lbl"><i class="fas fa-user-plus"></i> Buat Akun</span>
+      </button>
+      <div class="auth-divider">atau</div>
+      <div class="auth-footer">Sudah punya akun? <a onclick="showTab('login')">Masuk di sini</a></div>
+    </div>
+
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script>
+  const firebaseConfig = {
+    apiKey:            "AIzaSyCa_Bu1ca0vd78TkgTRcO3CDiJngIZCX4A",
+    authDomain:        "afl2-firebase-app.firebaseapp.com",
+    databaseURL:       "https://afl2-firebase-app-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId:         "afl2-firebase-app",
+    storageBucket:     "afl2-firebase-app.firebasestorage.app",
+    messagingSenderId: "921929778752",
+    appId:             "1:921929778752:web:879dee5fefc4205fbbc1a5",
+    measurementId:     "G-CTHVSEJ0W1"
+  };
+  firebase.initializeApp(firebaseConfig);
+  var auth = firebase.auth();
+
+  // Jika sudah login, langsung ke app
+  auth.onAuthStateChanged(function(user) {
+    if (user) window.location.href = 'index.html';
+  });
+
+  function showTab(tab) {
+    ['login','register'].forEach(function(t) {
+      document.getElementById('form-' + t).classList.remove('active');
+      document.getElementById('tab-' + t + '-btn').classList.remove('active');
+    });
+    document.getElementById('form-' + tab).classList.add('active');
+    document.getElementById('tab-' + tab + '-btn').classList.add('active');
+    clearAlerts();
+  }
+
+  function doLogin() {
+    var email = document.getElementById('login-email').value.trim();
+    var pass  = document.getElementById('login-password').value;
+    if (!email || !pass) { showAlert('login','Email dan password harus diisi!'); return; }
+    setLoading('btn-login', true); clearAlerts();
+    auth.signInWithEmailAndPassword(email, pass)
+      .then(function(r) {
+        showToast('✅ Selamat datang, ' + (r.user.displayName || r.user.email) + '!', 'success');
+        setTimeout(function(){ window.location.href = 'index.html'; }, 800);
+      })
+      .catch(function(e) { setLoading('btn-login',false); showAlert('login', errMsg(e.code)); });
+  }
+
+  function doRegister() {
+    var name    = document.getElementById('register-name').value.trim();
+    var email   = document.getElementById('register-email').value.trim();
+    var pass    = document.getElementById('register-password').value;
+    var confirm = document.getElementById('register-confirm').value;
+    if (!name||!email||!pass||!confirm) { showAlert('register','Semua field harus diisi!'); return; }
+    if (pass.length < 6)   { showAlert('register','Password minimal 6 karakter!'); return; }
+    if (pass !== confirm)  { showAlert('register','Konfirmasi password tidak cocok!'); return; }
+    setLoading('btn-register', true); clearAlerts();
+    auth.createUserWithEmailAndPassword(email, pass)
+      .then(function(r) { return r.user.updateProfile({ displayName: name }); })
+      .then(function() {
+        showToast('🎉 Akun berhasil dibuat!', 'success');
+        setTimeout(function(){ window.location.href = 'index.html'; }, 900);
+      })
+      .catch(function(e) { setLoading('btn-register',false); showAlert('register', errMsg(e.code)); });
+  }
+
+  function togglePw(id, btn) {
+    var inp = document.getElementById(id);
+    var ico = btn.querySelector('i');
+    if (inp.type==='password') { inp.type='text'; ico.classList.replace('fa-eye','fa-eye-slash'); }
+    else { inp.type='password'; ico.classList.replace('fa-eye-slash','fa-eye'); }
+  }
+
+  function checkStrength(pw) {
+    var bar = document.getElementById('pw-bar'), lbl = document.getElementById('pw-label');
+    var score = 0;
+    if (pw.length>=6) score++;
+    if (pw.length>=10) score++;
+    if (/[A-Z]/.test(pw)) score++;
+    if (/[0-9]/.test(pw)) score++;
+    if (/[^A-Za-z0-9]/.test(pw)) score++;
+    var levels = [
+      {p:'0%', c:'transparent', t:'Masukkan password'},
+      {p:'20%',c:'#D62828',t:'Sangat lemah'},
+      {p:'40%',c:'#E07A3C',t:'Lemah'},
+      {p:'65%',c:'#E8A84A',t:'Cukup'},
+      {p:'85%',c:'#52B788',t:'Kuat'},
+      {p:'100%',c:'#2D6A4F',t:'Sangat kuat 🔒'}
+    ];
+    var lv = pw.length===0 ? levels[0] : levels[Math.min(score,5)];
+    bar.style.width=lv.p; bar.style.background=lv.c;
+    lbl.textContent=lv.t; lbl.style.color = lv.c==='transparent'?'var(--brown-mid)':lv.c;
+  }
+
+  function setLoading(id, state) {
+    var btn = document.getElementById(id);
+    btn.disabled = state;
+    btn.classList[state?'add':'remove']('loading');
+  }
+  function showAlert(form, msg) {
+    var el = document.getElementById(form+'-alert');
+    document.getElementById(form+'-alert-msg').textContent = msg;
+    el.classList.add('show');
+  }
+  function clearAlerts() {
+    document.querySelectorAll('.auth-alert').forEach(function(e){ e.classList.remove('show'); });
+  }
+  function showToast(msg, type) {
+    var c=document.getElementById('toast-container'), t=document.createElement('div');
+    t.className='toast toast-'+(type||'success'); t.innerHTML=msg;
+    c.appendChild(t); setTimeout(function(){t.remove();},3200);
+  }
+  function errMsg(code) {
+    var m = {
+      'auth/user-not-found':'Email tidak terdaftar.',
+      'auth/wrong-password':'Password salah.',
+      'auth/invalid-email':'Format email tidak valid.',
+      'auth/email-already-in-use':'Email sudah digunakan akun lain.',
+      'auth/weak-password':'Password terlalu lemah (min. 6 karakter).',
+      'auth/too-many-requests':'Terlalu banyak percobaan. Coba lagi nanti.',
+      'auth/network-request-failed':'Gagal terhubung ke internet.',
+      'auth/invalid-credential':'Email atau password salah.'
+    };
+    return m[code] || 'Terjadi kesalahan ('+code+')';
+  }
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key!=='Enter') return;
+    if (document.getElementById('form-login').classList.contains('active')) doLogin();
+    else doRegister();
+  });
+</script>
+</body>
+</html>
