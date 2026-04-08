@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>📚 LibraryHub — Manajemen Buku</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+
+<!-- ═══════════════════ HEADER ═══════════════════ -->
+<header>
+  <div class="header-inner">
+
+    <a class="logo" href="#">
+      <div class="logo-icon"><i class="fas fa-book-open"></i></div>
+      <div>
+        <div class="logo-text">LibraryHub</div>
+        <div class="logo-sub">Perpustakaan Digital</div>
+      </div>
+    </a>
+
+    <div class="header-stats">
+      <div class="stat-chip">
+        <i class="fas fa-books"></i>
+        <span>Total</span>
+        <span class="count" id="stat-total">0</span>
+      </div>
+      <div class="stat-chip">
+        <i class="fas fa-circle-check" style="color:var(--sage)"></i>
+        <span>Tersedia</span>
+        <span class="count" id="stat-available">0</span>
+      </div>
+      <div class="stat-chip">
+        <i class="fas fa-clock" style="color:var(--amber)"></i>
+        <span>Dipinjam</span>
+        <span class="count" id="stat-borrowed">0</span>
+      </div>
+    </div>
+
+    <div class="user-chip" id="user-chip" style="display:none">
+      <div class="user-avatar" id="user-avatar">?</div>
+      <span id="user-name"></span>
+      <button class="logout-btn" id="btn-logout" title="Keluar" onclick="doLogout()">
+        <i class="fas fa-right-from-bracket"></i>
+      </button>
+    </div>
+
+  </div>
+</header>
+
+<!-- ═══════════════════ HERO ═══════════════════ -->
+<section class="hero">
+  <div class="hero-tag"><i class="fas fa-star"></i> Sistem Manajemen Perpustakaan</div>
+  <h1>Kelola Koleksi<br><em>Buku Anda</em></h1>
+  <p>Tambah, edit, dan pantau status seluruh koleksi perpustakaan digital Anda dengan mudah.</p>
+</section>
+
+<!-- ═══════════════════ MAIN CONTENT ═══════════════════ -->
+<main class="container">
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <button class="tab-btn active" id="btn-tab-list">
+      <i class="fas fa-list tab-icon"></i> Daftar Buku
+    </button>
+    <button class="tab-btn" id="btn-tab-add">
+      <i class="fas fa-plus tab-icon"></i> Tambah Buku
+    </button>
+  </div>
+
+  <!-- ─── TAB: Daftar Buku ─── -->
+  <div class="tab-content active" id="tab-list">
+    <div class="card">
+      <div class="search-bar">
+        <div class="search-wrap">
+          <i class="fas fa-magnifying-glass"></i>
+          <input type="text" id="search-input" placeholder="Cari judul, pengarang, atau ISBN…"/>
+        </div>
+        <select class="filter-select" id="filter-genre">
+          <option value="">Semua Genre</option>
+          <option>Fiksi</option>
+          <option>Non-Fiksi</option>
+          <option>Sains</option>
+          <option>Teknologi</option>
+          <option>Sejarah</option>
+          <option>Biografi</option>
+          <option>Lainnya</option>
+        </select>
+        <select class="filter-select" id="filter-status">
+          <option value="">Semua Status</option>
+          <option>Tersedia</option>
+          <option>Dipinjam</option>
+          <option>Hilang</option>
+        </select>
+      </div>
+
+      <div id="books-container">
+        <div class="loader">
+          <div class="spinner"></div>
+          <p>Memuat data buku…</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ─── TAB: Tambah Buku ─── -->
+  <div class="tab-content" id="tab-add">
+    <div class="card">
+      <div class="card-title">
+        <div class="icon-badge badge-add"><i class="fas fa-plus"></i></div>
+        Tambah Buku Baru
+      </div>
+      <p class="card-subtitle">Isi informasi buku yang ingin ditambahkan ke koleksi perpustakaan.</p>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Judul <span>*</span></label>
+          <input type="text" id="add-title" placeholder="Judul buku"/>
+        </div>
+        <div class="form-group">
+          <label>Pengarang <span>*</span></label>
+          <input type="text" id="add-author" placeholder="Nama pengarang"/>
+        </div>
+        <div class="form-group">
+          <label>ISBN <span>*</span></label>
+          <input type="text" id="add-isbn" placeholder="978-xxx-xxx-xxx-x"/>
+        </div>
+        <div class="form-group">
+          <label>Tahun Terbit <span>*</span></label>
+          <input type="number" id="add-year" placeholder="2024" min="1000" max="2099"/>
+        </div>
+        <div class="form-group">
+          <label>Genre <span>*</span></label>
+          <select id="add-genre">
+            <option value="">— Pilih Genre —</option>
+            <option>Fiksi</option>
+            <option>Non-Fiksi</option>
+            <option>Sains</option>
+            <option>Teknologi</option>
+            <option>Sejarah</option>
+            <option>Biografi</option>
+            <option>Lainnya</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Status</label>
+          <select id="add-status">
+            <option value="Tersedia">Tersedia</option>
+            <option value="Dipinjam">Dipinjam</option>
+            <option value="Hilang">Hilang</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label>Deskripsi</label>
+          <textarea id="add-desc" placeholder="Deskripsi singkat buku (opsional)…"></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" id="btn-add-book">
+          <i class="fas fa-plus"></i> Simpan Buku
+        </button>
+        <button class="btn btn-ghost" id="btn-clear-form">
+          <i class="fas fa-rotate-left"></i> Reset
+        </button>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<!-- ═══════════════════ MODAL: Edit ═══════════════════ -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="card-title">
+        <div class="icon-badge badge-edit"><i class="fas fa-pen"></i></div>
+        Edit Buku
+      </div>
+      <button class="modal-close" id="btn-close-edit"><i class="fas fa-xmark"></i></button>
+    </div>
+
+    <input type="hidden" id="edit-id"/>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>Judul <span>*</span></label>
+        <input type="text" id="edit-title"/>
+      </div>
+      <div class="form-group">
+        <label>Pengarang <span>*</span></label>
+        <input type="text" id="edit-author"/>
+      </div>
+      <div class="form-group">
+        <label>ISBN</label>
+        <input type="text" id="edit-isbn"/>
+      </div>
+      <div class="form-group">
+        <label>Tahun Terbit</label>
+        <input type="number" id="edit-year" min="1000" max="2099"/>
+      </div>
+      <div class="form-group">
+        <label>Genre</label>
+        <select id="edit-genre">
+          <option>Fiksi</option>
+          <option>Non-Fiksi</option>
+          <option>Sains</option>
+          <option>Teknologi</option>
+          <option>Sejarah</option>
+          <option>Biografi</option>
+          <option>Lainnya</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="edit-status">
+          <option value="Tersedia">Tersedia</option>
+          <option value="Dipinjam">Dipinjam</option>
+          <option value="Hilang">Hilang</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>Deskripsi</label>
+        <textarea id="edit-desc"></textarea>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn btn-primary" id="btn-save-edit">
+        <i class="fas fa-floppy-disk"></i> Simpan Perubahan
+      </button>
+      <button class="btn btn-ghost" id="btn-cancel-edit">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MODAL: Detail ═══════════════════ -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="card-title">
+        <div class="icon-badge badge-add"><i class="fas fa-eye"></i></div>
+        Detail Buku
+      </div>
+      <button class="modal-close" id="btn-close-detail-1"><i class="fas fa-xmark"></i></button>
+    </div>
+
+    <div class="detail-grid" id="detail-content"></div>
+
+    <div class="form-actions" style="margin-top:24px">
+      <button class="btn btn-ghost" id="btn-close-detail-2">
+        <i class="fas fa-xmark"></i> Tutup
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ MODAL: Hapus ═══════════════════ -->
+<div class="modal-overlay" id="delete-modal">
+  <div class="modal" style="max-width:420px; text-align:center">
+    <input type="hidden" id="delete-id"/>
+    <div style="font-size:3rem; margin-bottom:12px">🗑️</div>
+    <h3 style="font-family:'Playfair Display',serif; color:var(--brown-deep); margin-bottom:8px">Hapus Buku?</h3>
+    <p style="color:var(--brown-mid); font-size:0.9rem; margin-bottom:28px">
+      Tindakan ini tidak dapat dibatalkan. Data buku akan dihapus secara permanen.
+    </p>
+    <div class="form-actions" style="justify-content:center">
+      <button class="btn btn-danger" id="btn-confirm-delete">
+        <i class="fas fa-trash"></i> Ya, Hapus
+      </button>
+      <button class="btn btn-ghost" id="btn-cancel-delete">Batal</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ TOAST ═══════════════════ -->
+<div id="toast-container"></div>
+
+<!-- ═══════════════════ SCRIPTS ═══════════════════ -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="auth.js"></script>
+<script src="app.js"></script>
+
+</body>
+</html>
